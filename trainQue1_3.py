@@ -24,10 +24,10 @@ import heapq
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-wp' , '--wandb_project', help='Project name used to track experiments in Weights & Biases dashboard' , type=str, default='DL-Assignment3')
+parser.add_argument('-wp' , '--wandb_project', help='Project name used to track experiments in Weights & Biases dashboard' , type=str, default='CS6910-Assignment3')
 parser.add_argument('-we', '--wandb_entity' , help='Wandb Entity used to track experiments in the Weights & Biases dashboard.' , type=str, default='cs23m026')
-parser.add_argument('-d', '--datapath', help='give data path e.g. /kaggle/input/vocabs/Dataset', type=str, default='D:/DL_A3/Dataset')
-parser.add_argument('-l', '--lang', help='languge', type=str, default='hin')
+parser.add_argument('-d', '--datapath', help='give data path e.g. /kaggle/input/vocabs/Dataset', type=str, default='/kaggle/input/vocabs/Dataset')
+parser.add_argument('-l', '--lang', help='language', type=str, default='hin')
 parser.add_argument('-e', '--epochs', help="Number of epochs to train network.", type=int, default=10)
 parser.add_argument('-b', '--batch_size', help="Batch size used to train network.", type=int, default=32)
 parser.add_argument('-dp', '--dropout', help="dropout probablity in Ecoder & Decoder", type=float, default=0.3)
@@ -853,4 +853,5 @@ if __name__ == "__main__":
         total_words = len(processed_data["test_x"])
         msg = f"Test Accuracy : {accuracy}, Correct_pred : {correct_pred}/{total_words}"
         print(msg)
+    
     
