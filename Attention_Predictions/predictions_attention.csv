@@ -1,4 +1,4 @@
-Input_Word,Decoded_Output,True_Output,Match Result
+Word,Predicted_Word,Correct_Word,Result
 thermax,थर्मैक्स,थरमैक्स,Incorrect
 sikhaaega,सिखाएगा,सिखाएगा,Correct
 learn,लीयर्न,लर्न,Incorrect
