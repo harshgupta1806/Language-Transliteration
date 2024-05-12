@@ -23,6 +23,9 @@ import heapq
 # Import Libraries for tanking argument from command line
 import argparse
 
+# Import warnings
+import warnings
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-wp' , '--wandb_project', help='Project name used to track experiments in Weights & Biases dashboard' , type=str, default='CS6910-Assignment3')
 parser.add_argument('-we', '--wandb_entity' , help='Wandb Entity used to track experiments in the Weights & Biases dashboard.' , type=str, default='cs23m026')
@@ -831,7 +834,11 @@ def evaluate_model(params, model, device, processed_data):
     # Return accuracy and number of correct predictions
     return accuracy, correct_predictions
 
+
 if __name__ == "__main__":
+    # Suppress all warnings
+    warnings.filterwarnings("ignore")
+
     # Get arguments from command line
     arguments = parser.parse_args()
 

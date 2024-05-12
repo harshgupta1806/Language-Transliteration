@@ -24,6 +24,9 @@ import heapq
 # Import Libraries for tanking argument from command line
 import argparse
 
+# Import warnings
+import warnings
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-wp' , '--wandb_project', help='Project name used to track experiments in Weights & Biases dashboard' , type=str, default='DL-Assignment3')
@@ -45,8 +48,8 @@ parser.add_argument('-o', '--optimizer', help = 'choices: ["sgd", "adagrad", "ad
 parser.add_argument('-lr', '--learning_rate', help = 'Learning rate for training', type=float, default=0.001)
 parser.add_argument('-p', '--console', help='print training_accuracy + loss, validation_accuracy + loss for every epochs', choices=[0, 1], type=int, default=1)
 parser.add_argument('-wl', '--wandb_log', help='log on wandb', choices=[0, 1], type=int, default=0)
-parser.add_argument('-eval', '--evaluate', help='get test accuarcy and test loss', choices=[0, 1], type=int, default=0)
-parser.add_argument('-t_random', '--translate_random', help='plot attention matrix', choices=[0, 1], type=int, default=1)
+parser.add_argument('-eval', '--evaluate', help='get test accuarcy and test loss', choices=[0, 1], type=int, default=1)
+parser.add_argument('-t_random', '--translate_random', help='get 10 Random words and their translations from test data', choices=[0, 1], type=int, default=0)
 
 
 
@@ -933,6 +936,9 @@ def random_test_words(processed_data, model, HYPER_PARAM, device):
 
 
 if __name__ == "__main__":
+    # Suppress all warnings
+    warnings.filterwarnings("ignore")
+
     # Get arguments from command line
     arguments = parser.parse_args()
 
