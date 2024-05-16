@@ -17,10 +17,9 @@ This repository offers a Python implementation of a Seq2Seq model built with PyT
             - `drop_prob (float)`: Dropout probability for regularization.<br />
             - `cell_type (str)`: Type of RNN cell (LSTM, GRU, RNN).<br />
             - `bidirectional (bool)`: Whether to use a bidirectional RNN.<br />
-  
-- **Methods**:
-  - `__init__()`: Initializes the encoder.
-  - `forward()`: Performs forward pass through the encoder.
+  - **Methods**:
+          - `__init__()`: Initializes the encoder.
+          - `forward()`: Performs forward pass through the encoder.
 
 ### Decoder
 -   **Args:**
@@ -41,14 +40,14 @@ This repository offers a Python implementation of a Seq2Seq model built with PyT
 ### Seq2Seq
 -   **Args:**
     -   `encoder (Encoder)`: Encoder module. <br />
-        `decoder (Decoder)`: Decoder module.<br />
-        `param (dict)`: Model hyperparameters.<br />
+    -    `decoder (Decoder)`: Decoder module.<br />
+    -   `param (dict)`: Model hyperparameters.<br />
             - `tfr (float)`: Teacher forcing ratio for training.<br />
-        `processed_data (dict)` : containing all information of processed data<br />
+    -    `processed_data (dict)` : containing all information of processed data<br />
 
-- **Methods**:
-  - `__init__()`: Initializes the Seq2Seq model.
-  - `forward()`: Performs forward pass through the model.
+- **Methods**: <br />
+  - `__init__()`: Initializes the Seq2Seq model. <br />
+  - `forward()`: Performs forward pass through the model. <br />
     
 ---
 
@@ -168,29 +167,40 @@ Within this repository, you'll discover a Python implementation of a sequence-to
 ### Decoder class for sequence-to-sequence model with attention mechanism.
 
 - **Args:**
-       - params (dict): A dictionary containing decoder parameters.
-            - "decoder_input_size" (int): Size of the decoder input. <br />
-            - "embedding_size" (int): Size of the embedding. <br />
-            - "hidden_size" (int): Size of the hidden state. <br />
-            - "decoder_output_size" (int): Size of the decoder output.<br />
-            - "num_layers" (int): Number of layers.<br />
-            - "drop_prob" (float): Dropout probability.<br />
-            - "cell_type" (str): Type of RNN cell (LSTM, GRU, RNN).<br />
-            - "bidirectional" (bool): Whether the RNN is bidirectional.<br />
-   **Methods :**
-        - `init()` : Initialize Decoder instance
-        - `forward()` : Forward pass for the decoder
+  - params (dict): A dictionary containing decoder parameters. <br />
+        - `decoder_input_size (int)`: Size of the decoder input. <br />
+        - `embedding_size (int)`: Size of the embedding. <br />
+        - `hidden_size (int)`: Size of the hidden state. <br />
+        - `decoder_output_size (int)`: Size of the decoder output.<br />
+        - `num_layers (int)`: Number of layers.<br />
+        - `drop_prob" (float)`: Dropout probability.<br />
+        - `cell_type (str)`: Type of RNN cell (LSTM, GRU, RNN).<br />
+        - `bidirectional (bool)`: Whether the RNN is bidirectional.<br />
+- **Methods :**
+    - `init()` : Initialize Decoder instance
+    - `forward()` : Forward pass for the decoder
 
 ### Sequence-to-sequence model for translation tasks.
 
- - **Args**:
-       - encoder: The encoder module. <br />
-       - decoder: The decoder module. <br />
-       - params (dict): A dictionary containing model parameters. <br />
-       - processed_data (dict): A dictionary containing processed data needed for translation. <br />
-     **Methods :**
-        - `init()` : Initialize Seq2Seq instance.
-        - `forward()` : Forward pass for the Seq2Seq.  
+- **Args**:
+       - `encoder` : The encoder module. <br />
+       - `decoder` : The decoder module. <br />
+       - `params (dict)`: A dictionary containing model parameters. <br />
+       - `processed_data (dict)`: A dictionary containing processed data needed for translation. <br />
+- **Methods :**
+        - `init()` : Initialize Seq2Seq instance. <br />
+        - `forward()` : Forward pass for the Seq2Seq. <br />
+
+### Attention Class
+
+- **Methods :**  <br />
+          - `forward()` : Forward pass for Attention <br />
+          - `dot_score()` : Calculate dot product attention scores. <br />
+                  **Args:** <br />
+                        - `hidden_state (Tensor)` : The hidden state of the decoder. Shape: (batch_size, 1, hidden_size) <br />
+                        - `encoder_state (Tensor)` : The output of the encoder. Shape: (batch_size, max_length, hidden_size) <br />
+
+--- 
 
 ## Usage
 
