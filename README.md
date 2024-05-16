@@ -52,6 +52,27 @@ This repository offers a Python implementation of a Seq2Seq model built with PyT
     
 ---
 
+### Beam Search Function
+
+- **Beam search decoding for sequence-to-sequence models.**
+
+   - **Args:**
+        - params (dict): Model hyperparameters.
+            - encoder_cell_type (str): Type of RNN cell (LSTM, GRU, RNN).
+            - beam_width (int): Beam width for beam search decoding.
+            - length_penalty (float): Penalty for longer sequences.
+       - model (nn.Module): Seq2Seq model for sequence translation.
+       - word (str): Input word to translate.
+       - device (torch.device): Device to use for computations (CPU or GPU).
+       - processed_data (dict) : Contains All Information & Data in dictionary
+           - max_encoder_length (int): Maximum length of the encoder input sequence.
+           - input_corpus_dict (dict): Dictionary mapping input characters to integer indices.
+           - output_corpus_dict (dict): Dictionary mapping integer indices to output characters.
+           - reverse_output_corpus (dict): Dictionary mapping output characters to integer indices (for reversing prediction).
+
+    - **Returns**:
+        - str: Translated sentence.
+
 ## Installation
 
 To run the training script, ensure you have Python 3 installed along with the following dependencies:
@@ -127,6 +148,50 @@ These metrics offer valuable insights into the performance of the Seq2Seq model 
 
 Within this repository, you'll discover a Python implementation of a sequence-to-sequence (Seq2Seq) model with an attention mechanism tailored for sequence prediction tasks. Developed using PyTorch, this Seq2Seq model is equipped with an attention mechanism designed to spotlight pertinent segments of the input sequence while decoding.
 
+## Classes
+
+### Encoder class for sequence-to-sequence model with attention mechanism.
+
+  -  **Args:**
+       - PARAM (dict): A dictionary containing encoder parameters. <br />
+            - `encoder_input_size (int)`: Size of the encoder input. <br />
+            - `embedding_size (int)`: Size of the embedding. <br />
+            - `hidden_size (int)`: Size of the hidden state. <br />
+            - `num_layers (int)`: Number of layers. <br />
+            - `drop_prob (float)`: Dropout probability. <br /> 
+            - `cell_type (str)`: Type of RNN cell (LSTM, GRU, RNN). <br />
+            - `bidirectional (bool)`: Whether the RNN is bidirectional. <br />
+  - **Methods :**
+        - `init()` : Initialize Encoder instance
+        - `forward()` : Forward pass for the encoder
+
+### Decoder class for sequence-to-sequence model with attention mechanism.
+
+- **Args:**
+       - params (dict): A dictionary containing decoder parameters.
+            - "decoder_input_size" (int): Size of the decoder input. <br />
+            - "embedding_size" (int): Size of the embedding. <br />
+            - "hidden_size" (int): Size of the hidden state. <br />
+            - "decoder_output_size" (int): Size of the decoder output.<br />
+            - "num_layers" (int): Number of layers.<br />
+            - "drop_prob" (float): Dropout probability.<br />
+            - "cell_type" (str): Type of RNN cell (LSTM, GRU, RNN).<br />
+            - "bidirectional" (bool): Whether the RNN is bidirectional.<br />
+   **Methods :**
+        - `init()` : Initialize Decoder instance
+        - `forward()` : Forward pass for the decoder
+
+### Sequence-to-sequence model for translation tasks.
+
+ - **Args**:
+       - encoder: The encoder module. <br />
+       - decoder: The decoder module. <br />
+       - params (dict): A dictionary containing model parameters. <br />
+       - processed_data (dict): A dictionary containing processed data needed for translation. <br />
+     **Methods :**
+        - `init()` : Initialize Seq2Seq instance.
+        - `forward()` : Forward pass for the Seq2Seq.  
+
 ## Usage
 
 To train the Seq2Seq model with different RNN cell types, use the `trainAttention.py` script with the following command-line arguments:
@@ -169,12 +234,12 @@ python trainAttention.py -d your/dataset/path/up/to/aksharantar_sampled -l hin
 
 Below are the output metrics furnished during both training and validation:
 
-** Training Accuracy (Character-level) **: Indicates the accuracy of character-level predictions on the training data.
-** Training Average Loss **: Represents the average loss computed throughout the training process.
-** Validation Accuracy (Character-level) **: Reflects the accuracy of character-level predictions on the validation data.
-** Validation Average Loss**: Denotes the average loss calculated during validation.
-** Word Accuracy on Validation (Using Beam Search) **: Measures the accuracy of word-level predictions on the validation data employing beam search.
-** Correct Predictions **: Signifies the count of accurately predicted samples out of the total validation dataset.
+- **Training Accuracy (Character-level)**: Indicates the accuracy of character-level predictions on the training data.
+- **Training Average Loss**: Represents the average loss computed throughout the training process.
+- **Validation Accuracy (Character-level)**: Reflects the accuracy of character-level predictions on the validation data.
+- **Validation Average Loss**: Denotes the average loss calculated during validation.
+- **Word Accuracy on Validation (Using Beam Search)**: Measures the accuracy of word-level predictions on the validation data employing beam search.
+- **Correct Predictions**: Signifies the count of accurately predicted samples out of the total validation dataset.
 
 These metrics offer valuable insights into the performance of the Seq2Seq model during training and validation. Character-level accuracy assesses the precision of individual character predictions, while word-level accuracy evaluates the correctness of entire output sequences
 
