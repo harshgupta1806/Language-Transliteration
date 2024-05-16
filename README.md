@@ -98,10 +98,10 @@ To train the Seq2Seq model with different RNN cell types, use the `train.py` scr
 | -wl, --wandb_log | log on wandb, Choice :- 0 (for not log on wandb), 1 (for log) | 0 |
 | -eval, --evaluate | print test accuracy and test loss, Choices 0 (for not evaluating), 1 (for evaluating) | 0 |
 
-Example command to run the training script:
+Example command to run the trainQue1_3.py script:
 
 ```bash
-python train_vanilla.py -d your/dataset/path/up/to/aksharantar_sampled -l hin
+python trainQue1_3.py -d your/dataset/path/up/to/aksharantar_sampled -l hin
 ```
 #### Datapath contains path till parent directory of language folder in unzipped dataset (language folder must not included in datapath, seperate argument -l/--lang must used to set language folder)
 
@@ -126,5 +126,58 @@ These metrics offer valuable insights into the performance of the Seq2Seq model 
 # Seq2Seq MODEL WITH ATTENTION
 
 Within this repository, you'll discover a Python implementation of a sequence-to-sequence (Seq2Seq) model with an attention mechanism tailored for sequence prediction tasks. Developed using PyTorch, this Seq2Seq model is equipped with an attention mechanism designed to spotlight pertinent segments of the input sequence while decoding.
+
+## Usage
+
+To train the Seq2Seq model with different RNN cell types, use the `trainAttention.py` script with the following command-line arguments:
+
+| Argument            | Description                                       | Default Value     |
+|---------------------|---------------------------------------------------|-------------------|
+| -wp, --wandb_project    |Project name used to track experiments in Weights & Biases dashboard | CS6910-Assignment3 |
+| -we, --wandb_entity | Wandb Entity used to track experiments in the Weights & Biases dashboard. | cs23m026 |
+| -d, --datapath | give data path e.g. /kaggle/input/vocabs/Dataset_Name | '/kaggle/input/vocabs/Dataset' |
+| -l, --lang  | language                                       | hin               |
+| -e, --epochs   | Number of epochs to train network. | 10                 |
+| -b, --batch_size    | Batch size used to train network.              | 32            |
+| -dp, --dropout      | dropout probablity in Ecoder & Decoder         | 0.3               |
+| -nl, --num_layers      | number of layers in encoder & decoder         | 2              |
+| -lr, --learning_rate| Learning rate                                     | 0.01              |
+| -bw, --beam_width   | Beam Width for beam Search                       | 1                |
+| -cell, --cell_type   | Cell Type of Encoder and Decoder (LSTM, RNN, GRU) | LSTM            |
+| -emp_size, --embedding_size    | Embadding Size | 256 |
+| -hdn_size, --hidden_size | Hidden Size                             | 512                 |
+| -lp, --length_penalty | Length penalty for beam search                  | 0.6               |
+| -tfr, --teacher_forcing_ratio | Teacher forcing ratio                          | 0.5        |
+| -bi_dir, --bidirectional | Use bidirectional encoder                        | True          |
+| -o, --optimizer    | Optimizers :- (sgd, adagrad, adam, rmsprop)| adam                |
+| -p, --console | Print training Accuracy, training_loss, validations accuracy, validation_loss for every epoch, Choice :- 0 (for not printing), 1 (for printing) | 1 |
+| -wl, --wandb_log | log on wandb, Choice :- 0 (for not log on wandb), 1 (for log) | 0 |
+| -eval, --evaluate | print test accuracy and test loss, Choices 0 (for not evaluating), 1 (for evaluating) | 0 |
+| -t_random, --translate_random | get 10 Random words and their translations from test data. Choice :- 0, 1 | 0 |
+
+Example command to run the trainAttention script:
+
+```bash
+python trainAttention.py -d your/dataset/path/up/to/aksharantar_sampled -l hin
+```
+
+#### Datapath contains path till parent directory of language folder in unzipped dataset (language folder must not included in datapath, seperate argument -l/--lang must used to set language folder)
+
+---
+
+## Output Matrices
+
+Below are the output metrics furnished during both training and validation:
+
+** Training Accuracy (Character-level) **: Indicates the accuracy of character-level predictions on the training data.
+** Training Average Loss **: Represents the average loss computed throughout the training process.
+** Validation Accuracy (Character-level) **: Reflects the accuracy of character-level predictions on the validation data.
+** Validation Average Loss**: Denotes the average loss calculated during validation.
+** Word Accuracy on Validation (Using Beam Search) **: Measures the accuracy of word-level predictions on the validation data employing beam search.
+** Correct Predictions **: Signifies the count of accurately predicted samples out of the total validation dataset.
+
+These metrics offer valuable insights into the performance of the Seq2Seq model during training and validation. Character-level accuracy assesses the precision of individual character predictions, while word-level accuracy evaluates the correctness of entire output sequences
+
+---
 
 
