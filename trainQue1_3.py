@@ -40,7 +40,7 @@ parser.add_argument('-cell', '--cell_type', help="Cell Type of Encoder and Decod
 parser.add_argument('-emb_size', '--embadding_size', help="Embadding Size", type=int, default=256)
 parser.add_argument('-hdn_size', '--hidden_size', help="Hidden Size", type=int, default=512)
 parser.add_argument('-lp', '--length_penalty', help="Length Panelty", type=float, default=0.6)
-parser.add_argument('-bi_dir', '--bidirectional', help="Bidirectional", type=bool, default=True)
+parser.add_argument('-bi_dir', '--bidirectional', help="Bidirectional", type=int, choices=[0, 1], default=1)
 parser.add_argument('-tfr', '--teacher_forcing_ratio', help="Teacher Forcing Ratio", type=float, default=0.5)
 parser.add_argument('-o', '--optimizer', help = 'choices: ["sgd", "adagrad", "adam", "rmsprop"]', type=str, default = 'adam', choices= ["sgd", "rmsprop", "adam", "adagrad"])
 parser.add_argument('-lr', '--learning_rate', help = 'Learning rate for training', type=float, default=0.001)
@@ -779,7 +779,7 @@ def get_hyper_perameters(arguments, processed_data):
         "decoder_output_size": processed_data["output_corpus_length"],
         "beam_width" : arguments.beam_width,
         "length_penalty" : arguments.length_penalty,
-        "bidirectional" : arguments.bidirectional,
+        "bidirectional" : True if arguments.bidirectional else False,
         "learning_rate" : arguments.learning_rate,
         "batch_size" : arguments.batch_size,
         "epochs" : arguments.epochs,
