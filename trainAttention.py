@@ -1041,7 +1041,6 @@ if __name__ == "__main__":
 
     # Hyper Parameter Dict 
     params = get_hyper_perameters(arguments, processed_data)
-    print(params)
 
     # Train the Model 
     model, acc = training(params, processed_data, device, wandb_log = arguments.wandb_log)
