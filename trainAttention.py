@@ -282,6 +282,19 @@ class Attention(nn.Module):
     
 
 class Encoder(nn.Module):
+    """
+    Encoder class for sequence-to-sequence model.
+
+    Args:
+        PARAM (dict): A dictionary containing encoder parameters.
+            - "encoder_input_size" (int): Size of the encoder input.
+            - "embedding_size" (int): Size of the embedding.
+            - "hidden_size" (int): Size of the hidden state.
+            - "num_layers" (int): Number of layers.
+            - "drop_prob" (float): Dropout probability.
+            - "cell_type" (str): Type of RNN cell (LSTM, GRU, RNN).
+            - "bidirectional" (bool): Whether the RNN is bidirectional.
+    """
 
     def __init__(self, PARAM):
         super(Encoder, self).__init__()
@@ -297,9 +310,9 @@ class Encoder(nn.Module):
         self.embedding = nn.Embedding(self.input_size, self.embedding_size)
 
         cell_map = {
-        "LSTM": nn.LSTM,
-        "GRU": nn.GRU,
-        "RNN": nn.RNN
+            "LSTM": nn.LSTM,
+            "GRU": nn.GRU,
+            "RNN": nn.RNN
         }
         self.cell = cell_map[self.cell_type](
             self.embedding_size, self.hidden_size, self.num_layers,
@@ -307,145 +320,204 @@ class Encoder(nn.Module):
         )
     
     def forward(self, x):
+        """
+        Forward pass of the encoder.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            torch.Tensor: Encoder states.
+            torch.Tensor: Hidden state (if cell type is RNN or GRU).
+            torch.Tensor: Cell state (if cell type is LSTM).
+        """
         embedding = self.embedding(x)
         drops = self.dropout(embedding)
         if self.cell_type == "RNN" or self.cell_type == "GRU":
             encoder_states, hidden = self.cell(drops)
-            if self.bidirectional == True:
+            if self.bidirectional:
                 encoder_states = encoder_states[:, :, :self.hidden_size] + encoder_states[:, :, self.hidden_size:]
             return encoder_states, hidden
         elif self.cell_type == "LSTM":
             encoder_states, (hidden, cell) = self.cell(drops)
-            if self.bidirectional == True:
+            if self.bidirectional:
                 encoder_states = encoder_states[:, :, :self.hidden_size] + encoder_states[:, :, self.hidden_size:]
             return encoder_states, hidden, cell
-        
+
         
 class Decoder(nn.Module):
-  def __init__(self, params):
-    super(Decoder, self).__init__()
+    """
+    Decoder class for sequence-to-sequence model with attention mechanism.
 
-    # Initialize decoder parameters
-    self.input_size = params["decoder_input_size"]
-    self.embedding_size = params["embedding_size"]
-    self.hidden_size = params["hidden_size"]
-    self.output_size = params["decoder_output_size"]
-    self.num_layers = params["num_layers"]
-    self.drop_prob = params["drop_prob"]
-    self.cell_type = params["cell_type"]
-    self.bidirectional = params["bidirectional"]
+    Args:
+        params (dict): A dictionary containing decoder parameters.
+            - "decoder_input_size" (int): Size of the decoder input.
+            - "embedding_size" (int): Size of the embedding.
+            - "hidden_size" (int): Size of the hidden state.
+            - "decoder_output_size" (int): Size of the decoder output.
+            - "num_layers" (int): Number of layers.
+            - "drop_prob" (float): Dropout probability.
+            - "cell_type" (str): Type of RNN cell (LSTM, GRU, RNN).
+            - "bidirectional" (bool): Whether the RNN is bidirectional.
+    """
 
-    # Dropout layer
-    self.dropout = nn.Dropout(self.drop_prob)
+    def __init__(self, params):
+        super(Decoder, self).__init__()
 
-    # Embedding layer
-    self.embedding = nn.Embedding(self.input_size, self.embedding_size)
+        # Initialize decoder parameters
+        self.input_size = params["decoder_input_size"]
+        self.embedding_size = params["embedding_size"]
+        self.hidden_size = params["hidden_size"]
+        self.output_size = params["decoder_output_size"]
+        self.num_layers = params["num_layers"]
+        self.drop_prob = params["drop_prob"]
+        self.cell_type = params["cell_type"]
+        self.bidirectional = params["bidirectional"]
 
-    # Linear layer for combining context and decoder output
-    self.concatlayer = nn.Linear(self.hidden_size * 2, self.hidden_size)
+        # Dropout layer
+        self.dropout = nn.Dropout(self.drop_prob)
 
-    # Final output layer
-    self.fc = nn.Linear(self.hidden_size, self.output_size)
+        # Embedding layer
+        self.embedding = nn.Embedding(self.input_size, self.embedding_size)
 
-    # Apply LogSoftmax for probability distribution
-    self.log_softmax = nn.LogSoftmax(dim=1)
+        # Linear layer for combining context and decoder output
+        self.concatlayer = nn.Linear(self.hidden_size * 2, self.hidden_size)
 
-    # Attention layer
-    self.attn = Attention(self.num_layers)
+        # Final output layer
+        self.fc = nn.Linear(self.hidden_size, self.output_size)
 
-    # Select appropriate RNN cell based on cell_type parameter
-    self.cell_map = {
+        # Apply LogSoftmax for probability distribution
+        self.log_softmax = nn.LogSoftmax(dim=1)
+
+        # Attention layer
+        self.attn = Attention(self.num_layers)
+
+        # Select appropriate RNN cell based on cell_type parameter
+        self.cell_map = {
             "LSTM": nn.LSTM,
             "GRU": nn.GRU,
             "RNN": nn.RNN
         }
-    self.cell = self.cell_map[self.cell_type](
+        self.cell = self.cell_map[self.cell_type](
             self.embedding_size, self.hidden_size, self.num_layers,
             dropout=self.drop_prob
         )
 
-  def forward(self, x, encoder_states, hidden, cell):
-    # Embed input word
-    x = x.unsqueeze(0)
-    embedding = self.embedding(x)
-    drops = self.dropout(embedding)
+    def forward(self, x, encoder_states, hidden, cell):
+        """
+        Forward pass of the decoder.
 
-    # Pass through RNN cell based on type
-    if self.cell_type == "RNN" or self.cell_type == "GRU":
-          outputs, (hidden) = self.cell(drops, hidden)
-    elif self.cell_type == "LSTM":
-          outputs, (hidden, cell) = self.cell(drops, (hidden, cell))
-    else:
-          raise ValueError("Invalid cell type during forward pass: {}".format(self.cell_type))
+        Args:
+            x (torch.Tensor): Input tensor.
+            encoder_states (torch.Tensor): Encoder states.
+            hidden (torch.Tensor): Hidden state.
+            cell (torch.Tensor): Cell state (if cell type is LSTM).
 
-    # Attention mechanism
-    attention_weights = self.attn(outputs, encoder_states)
-    context = attention_weights.bmm(encoder_states.transpose(0, 1))
+        Returns:
+            torch.Tensor: Predictions.
+            torch.Tensor: Hidden state.
+            torch.Tensor: Cell state (if cell type is LSTM).
+            torch.Tensor: Attention weights.
+        """
+        # Embed input word
+        x = x.unsqueeze(0)
+        embedding = self.embedding(x)
+        drops = self.dropout(embedding)
 
-    # Squeeze outputs and context
-    outputs = outputs.squeeze(0)
-    context = context.squeeze(1)
+        # Pass through RNN cell based on type
+        if self.cell_type == "RNN" or self.cell_type == "GRU":
+            outputs, (hidden) = self.cell(drops, hidden)
+        elif self.cell_type == "LSTM":
+            outputs, (hidden, cell) = self.cell(drops, (hidden, cell))
+        else:
+            raise ValueError("Invalid cell type during forward pass: {}".format(self.cell_type))
 
-    # Concatenate decoder output and context
-    concat_input = torch.cat((outputs, context), 1)
+        # Attention mechanism
+        attention_weights = self.attn(outputs, encoder_states)
+        context = attention_weights.bmm(encoder_states.transpose(0, 1))
 
-    # Apply activation and linear layer
-    concat_output = torch.tanh(self.concatlayer(concat_input))
-    predictions = self.log_softmax(self.fc(concat_output))
+        # Squeeze outputs and context
+        outputs = outputs.squeeze(0)
+        context = context.squeeze(1)
 
-    # Return predictions, hidden state (and cell for LSTM) and attention weights
-    if self.cell_type == "LSTM":
-          return predictions, hidden, cell, attention_weights.squeeze(1)
-    else:
-          return predictions, hidden, attention_weights.squeeze(1)
+        # Concatenate decoder output and context
+        concat_input = torch.cat((outputs, context), 1)
+
+        # Apply activation and linear layer
+        concat_output = torch.tanh(self.concatlayer(concat_input))
+        predictions = self.log_softmax(self.fc(concat_output))
+
+        # Return predictions, hidden state (and cell for LSTM) and attention weights
+        if self.cell_type == "LSTM":
+            return predictions, hidden, cell, attention_weights.squeeze(1)
+        else:
+            return predictions, hidden, attention_weights.squeeze(1)
 
 
 class Seq2Seq(nn.Module):
-  def __init__(self, encoder, decoder, params, processed_data):
-    super(Seq2Seq, self).__init__()
-    self.cell_type = params["cell_type"]
-    self.encoder = encoder
-    self.decoder = decoder
-    self.teacher_forcing_ratio = params["tfr"]
-    self.output_corpus_length = processed_data["output_corpus_length"]
+    """
+    Sequence-to-sequence model for translation tasks.
 
-  def forward(self, src, target):
-    batch_size = src.shape[1]
-    target_len = target.shape[0]
-    x = target[0, :]
-    target_vocab_size = self.output_corpus_length
-    outputs = torch.zeros(target_len, batch_size, target_vocab_size).to(device)
-    
-    
-    
-    # Get encoder output and hidden state (or cell for LSTM)
-    if self.cell_type == "LSTM":
-        encoder_output, hidden, cell = self.encoder(src)
-        cell = cell[:self.decoder.num_layers]
-    else:
-        encoder_output, hidden = self.encoder(src)
-    hidden = hidden[:self.decoder.num_layers]
-    
-    # Iterate through target sequence
-    for i in range(1, target_len):
-      # Decode using previous word or teacher forcing
-      if self.cell_type == "LSTM":
-        output, hidden, cell, _ = self.decoder(x, encoder_output, hidden, cell)
-      else:
-        output, hidden, _ = self.decoder(x, encoder_output, hidden, None)
+    Args:
+        encoder: The encoder module.
+        decoder: The decoder module.
+        params (dict): A dictionary containing model parameters.
+        processed_data (dict): A dictionary containing processed data needed for translation.
+    """
 
-      outputs[i] = output
+    def __init__(self, encoder, decoder, params, processed_data):
+        super(Seq2Seq, self).__init__()
+        self.cell_type = params["cell_type"]
+        self.encoder = encoder
+        self.decoder = decoder
+        self.teacher_forcing_ratio = params["tfr"]
+        self.target_vocab_size = processed_data['output_corpus_length']
 
-      # Use teacher forcing with a probability
-      if random.random() < self.teacher_forcing_ratio:
-        next_word = target[i]
-      else:
-        next_word = output.argmax(dim=1)
+    def forward(self, src, target):
+        """
+        Forward pass of the Seq2Seq model.
 
-      # Update input word for next iteration
-      x = next_word
+        Args:
+            src (torch.Tensor): Source input tensor.
+            target (torch.Tensor): Target output tensor.
 
-    return outputs
+        Returns:
+            torch.Tensor: Output tensor.
+        """
+        batch_size = src.shape[1]
+        target_len = target.shape[0]
+        x = target[0, :]
+        target_vocab_size = self.target_vocab_size
+        outputs = torch.zeros(target_len, batch_size, target_vocab_size).to(device)
+
+        # Get encoder output and hidden state (or cell for LSTM)
+        if self.cell_type == "LSTM":
+            encoder_output, hidden, cell = self.encoder(src)
+            cell = cell[:self.decoder.num_layers]
+        else:
+            encoder_output, hidden = self.encoder(src)
+        hidden = hidden[:self.decoder.num_layers]
+
+        # Iterate through target sequence
+        for i in range(1, target_len):
+            # Decode using previous word or teacher forcing
+            if self.cell_type == "LSTM":
+                output, hidden, cell, _ = self.decoder(x, encoder_output, hidden, cell)
+            else:
+                output, hidden, _ = self.decoder(x, encoder_output, hidden, None)
+
+            outputs[i] = output
+
+            # Use teacher forcing with a probability
+            if random.random() < self.teacher_forcing_ratio:
+                next_word = target[i]
+            else:
+                next_word = output.argmax(dim=1)
+
+            # Update input word for next iteration
+            x = next_word
+
+        return outputs
 
  
 def set_optimizer(name, model, learning_rate):
@@ -481,33 +553,49 @@ def set_optimizer(name, model, learning_rate):
 
 
 def beam_search(PARAM, model, word, device, processed_data):
-    
+    """
+    Performs beam search to generate a sequence of output tokens.
+
+    Args:
+        PARAM (dict): A dictionary containing model parameters.
+        model: The Seq2Seq model.
+        word (str): Input word to be translated.
+        device: The device on which the model runs.
+        processed_data (dict): A dictionary containing processed data needed for translation.
+
+    Returns:
+        str: Translated sentence.
+    """
+    # Unpack processed data
     input_corpus_dict = processed_data["input_corpus_dict"]
     output_corpus_dict = processed_data["output_corpus_dict"]
     max_encoder_length = processed_data["max_encoder_length"]
     reversed_output_corpus = processed_data["reversed_output_corpus"]
-    
-    data = np.zeros((max_encoder_length+1, 1), dtype=np.int32)
-    
+
+    # Initialize data tensor for input word
+    data = np.zeros((max_encoder_length + 1, 1), dtype=np.int32)
     for i, char in enumerate(word):
         data[i, 0] = input_corpus_dict[char]
     data[i + 1, 0] = input_corpus_dict['$']  # Add end-of-sentence marker
-    
     data = torch.tensor(data, dtype=torch.int32).to(device)
 
+    # Encode input word
     with torch.no_grad():
         if PARAM["cell_type"] == "LSTM":
             outputs, hidden, cell = model.encoder(data)
-            cell =  cell[:PARAM['num_layers']]
+            cell = cell[:PARAM['num_layers']]
         elif PARAM["cell_type"] == "GRU" or PARAM["cell_type"] == "RNN":
             outputs, hidden = model.encoder(data)
-    hidden =  hidden[:PARAM['num_layers']]
+    hidden = hidden[:PARAM['num_layers']]
+
+    # Initialize beam search
     output_start = output_corpus_dict['#']
     start_token = np.array(output_start).reshape(1,)
     hidden_par = hidden.unsqueeze(0)
     initial_sequence = torch.tensor(start_token).to(device)
     beam = [(0.0, initial_sequence, hidden_par)]
 
+    # Perform beam search
     for i in range(len(output_corpus_dict)):
         candidates = []
         for score, seq, hidden in beam:
@@ -524,7 +612,7 @@ def beam_search(PARAM, model, word, device, processed_data):
                 output, hidden, attention_wt = model.decoder(x, outputs, hdn, None)
             
             probabilities = F.softmax(output, dim=1)
-            topk_probs, topk_tokens = torch.topk(probabilities, k = PARAM["beam_width"])               
+            topk_probs, topk_tokens = torch.topk(probabilities, k=PARAM["beam_width"])
     
             for prob, token in zip(topk_probs[0], topk_tokens[0]):
                 new_seq = torch.cat((seq, token.unsqueeze(0)), dim=0)
@@ -535,12 +623,13 @@ def beam_search(PARAM, model, word, device, processed_data):
     
         beam = heapq.nlargest(PARAM["beam_width"], candidates, key=lambda x: x[0])
 
+    # Retrieve best sequence and decode
     best_score, best_sequence, _ = max(beam, key=lambda x: x[0]) 
+    translated_sentence = ''.join([reversed_output_corpus[token.item()] for token in best_sequence[1:]])[:-1]
 
-    translated_sentance = ''.join([reversed_output_corpus[token.item()] for token in best_sequence[1:]])[:-1]
+    return translated_sentence
 
-    return translated_sentance
-        
+
 def run_epoch(model, data_loader, optimizer, criterion, processed_data):
     """
     Train the Seq2Seq model for one epoch.
@@ -755,6 +844,7 @@ def training(PARAM, processed_data, device, wandb_log = 0):
                 )
     return model, val_accuracy_beam
 
+# Function to get argument from command line
 def get_hyper_perameters(arguments, processed_data):
     HYPER_PARAM = {
         "encoder_input_size": processed_data["input_corpus_length"],
@@ -777,6 +867,7 @@ def get_hyper_perameters(arguments, processed_data):
 
     return HYPER_PARAM
 
+# Function to get model accuracy and loss on test data
 def evaluate_model(params, model, device, processed_data):
     """
     Evaluates the model using beam search on test data and returns accuracy and correct predictions.
@@ -822,6 +913,7 @@ def evaluate_model(params, model, device, processed_data):
     # Return accuracy and number of correct predictions
     return accuracy, correct_predictions
 
+# Function and their helpler function that print 10 random translated data from test data 
 def encode_input(word, processed_data):
     """
     Encode the input word into a tensor representation.
@@ -843,7 +935,6 @@ def encode_input(word, processed_data):
     
     data = torch.tensor(data,dtype = torch.int64).to(device)
     return data
-
 
 def generate_predictions(model, word, PARAM, device, processed_data):
     """
@@ -934,7 +1025,7 @@ def random_test_words(processed_data, model, HYPER_PARAM, device):
     
     return translation_dict, attention_dict
 
-
+# Main Function
 if __name__ == "__main__":
     # Suppress all warnings
     warnings.filterwarnings("ignore")
