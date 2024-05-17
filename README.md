@@ -123,8 +123,9 @@ Example command to run the trainQue1_3.py script:
 ```bash
 python trainQue1_3.py -d your/dataset/path/up/to/aksharantar_sampled -l hin
 ```
+### NOTE :
 #### Datapath contains path till parent directory of language folder in unzipped dataset (language folder must not included in datapath, seperate argument -l/--lang must used to set language folder)
-
+#### Train for atleast 10 epochs to get best predictions and accuracy.
 ---
 
 ### Output Metrices
@@ -235,9 +236,9 @@ Example command to run the trainAttention script:
 ```bash
 python trainAttention.py -d your/dataset/path/up/to/aksharantar_sampled -l hin
 ```
-
+### NOTE :
 #### Datapath contains path till parent directory of language folder in unzipped dataset (language folder must not included in datapath, seperate argument -l/--lang must used to set language folder)
-
+#### Train for atleast 10 epochs to get best predictions and accuracy.
 ---
 
 ## Output Matrices
