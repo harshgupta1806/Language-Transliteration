@@ -116,7 +116,7 @@ To train the Seq2Seq model with different RNN cell types, use the `train.py` scr
 | -o, --optimizer    | Optimizers :- (sgd, adagrad, adam, rmsprop)| adam                |
 | -p, --console | Print training Accuracy, training_loss, validations accuracy, validation_loss for every epoch, Choice :- 0 (for not printing), 1 (for printing) | 1 |
 | -wl, --wandb_log | log on wandb, Choice :- 0 (for not log on wandb), 1 (for log) | 0 |
-| -eval, --evaluate | print test accuracy and test loss, Choices 0 (for not evaluating), 1 (for evaluating) | 0 |
+| -eval, --evaluate | print test accuracy and test loss, Choices 0 (for not evaluating), 1 (for evaluating) | 1 |
 
 Example command to run the trainQue1_3.py script:
 
@@ -227,7 +227,7 @@ To train the Seq2Seq model with different RNN cell types, use the `trainAttentio
 | -o, --optimizer    | Optimizers :- (sgd, adagrad, adam, rmsprop)| adam                |
 | -p, --console | Print training Accuracy, training_loss, validations accuracy, validation_loss for every epoch, Choice :- 0 (for not printing), 1 (for printing) | 1 |
 | -wl, --wandb_log | log on wandb, Choice :- 0 (for not log on wandb), 1 (for log) | 0 |
-| -eval, --evaluate | print test accuracy and test loss, Choices 0 (for not evaluating), 1 (for evaluating) | 0 |
+| -eval, --evaluate | print test accuracy and test loss, Choices 0 (for not evaluating), 1 (for evaluating) | 1 |
 | -t_random, --translate_random | get 10 Random words and their translations from test data. Choice :- 0, 1 | 0 |
 
 Example command to run the trainAttention script:
