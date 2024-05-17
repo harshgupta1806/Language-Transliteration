@@ -46,7 +46,7 @@ parser.add_argument('-o', '--optimizer', help = 'choices: ["sgd", "adagrad", "ad
 parser.add_argument('-lr', '--learning_rate', help = 'Learning rate for training', type=float, default=0.001)
 parser.add_argument('-p', '--console', help='print training_accuracy + loss, validation_accuracy + loss for every epochs', choices=[0, 1], type=int, default=1)
 parser.add_argument('-wl', '--wandb_log', help='log on wandb', choices=[0, 1], type=int, default=0)
-parser.add_argument('-eval', '--evaluate', help='get test accuarcy and test loss', choices=[0, 1], type=int, default=0)
+parser.add_argument('-eval', '--evaluate', help='get test accuarcy and test loss', choices=[0, 1], type=int, default=1)
 
 
 # This function determines the appropriate device ("cpu" or "cuda") to use for training.
